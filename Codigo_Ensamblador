@@ -1,0 +1,67 @@
+;Aplicacion que lee datos del acerelometro para mandarlos mediante comunicacion uart a processing
+;DECLARACION DE REGISTROS
+;Actividad 5.1
+		  NAMEREG  s5, DatoSerial
+		  NAMEREG  s6, EstadoTX
+		  NAMEREG  s7, EstadoRX
+		  NAMEREG	 s8, LeidoRX
+;Actividad 5.2
+      NAMEREG  s0, RegistroEntradaXLSB
+      NAMEREG  s1, RegistroEntradaXMSB
+      NAMEREG  s2, RegistroEntradaYLSB
+      NAMEREG  s3, RegistroEntradaYMSB
+      NAMEREG  s4, RegistroEntradaZLSB
+      NAMEREG  s9, RegistroEntradaZMSB
+;DECLARACION DE PUERTOS LEDS
+;Actividad 5.2
+      CONSTANT PuertoEntradaXLSB, 41
+      CONSTANT PuertoEntradaXMSB, 42
+      CONSTANT PuertoEntradaYLSB, 43
+      CONSTANT PuertoEntradaYMSB, 44
+      CONSTANT PuertoEntradaZLSB, 45
+      CONSTANT PuertoEntradaZMSB, 46
+      CONSTANT PuertoSalidaLEDS,  02
+;Actividad 5.1
+      CONSTANT PuertoLeeListoTX,    11
+      CONSTANT PuertoEscribeDatoTX, 12
+      CONSTANT PuertoLeeDatoRX,     13
+      CONSTANT PuertoDatoListoRX,   14
+      CONSTANT PuertoDatoRXLeido,   15
+      CONSTANT PuertoSalida,        80
+
+
+lecturadatos:
+;LEO DATOS
+;Lee X
+      ;LOAD   DatoSerial, "X"
+      ;CALL   tx_uart
+      INPUT  RegistroEntradaXMSB, PuertoEntradaXMSB
+      LOAD   DatoSerial, RegistroEntradaXMSB
+      CALL   tx_uart
+      INPUT  RegistroEntradaXLSB, PuertoEntradaXLSB
+      LOAD   DatoSerial, RegistroEntradaXLSB
+      CALL   tx_uart
+      CAll   delay_1s
+
+
+      JUMP lecturadatos
+
+;TRANSMISION UART
+tx_uart:
+    INPUT		  EstadoTX, PuertoLeeListoTX
+    COMPARE		EstadoTX, 02
+    JUMP		  Z, tx_uart
+    OUTPUT		DatoSerial, PuertoEscribeDatoTX
+    RETURN
+
+;Rutina de Delay
+delay_1s:
+    LOAD      sa, 5f
+    LOAD      sb, 5e
+    LOAD      sc, 10
+delay_loop:
+    SUB 		  sc, 1'd
+    SUBCY 		sb, 0'd
+    SUBCY 		sa, 0'd
+    JUMP 		  NZ, delay_loop
+    RETURN
